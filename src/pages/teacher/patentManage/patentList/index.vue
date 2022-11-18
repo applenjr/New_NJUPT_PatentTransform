@@ -96,17 +96,26 @@
       <div id="CopyContent" v-html="siteContent"></div>
     </t-dialog>
 
-    <!--    &lt;!&ndash; 价格意向 &ndash;&gt;-->
-    <!--    <t-dialog-->
-    <!--      v-model:visible="priceIntentionDialogVisible"-->
-    <!--      width="800px"-->
-    <!--      header="导出引用"-->
-    <!--      confirmBtn="复制"-->
-    <!--      :confirm-on-enter="true"-->
-    <!--      @confirm="copySite"-->
-    <!--    >-->
-    <!--      <div id="CopyContent" v-html="siteContent"></div>-->
-    <!--    </t-dialog>-->
+    <!-- 价格意向 -->
+    <t-dialog
+      v-model:visible="priceIntentionDialogVisible"
+      width="400px"
+      header="价格意向"
+      :confirm-on-enter="true"
+      @confirm="submitPriceIntention"
+    >
+      <t-form labelAlign="top">
+        <t-form-item name="transform">
+          <t-input label="转让价格：" suffix="万元" type="number" v-model="priceData.transform" size="large" />
+        </t-form-item>
+        <t-form-item name="permission">
+          <t-input label="许可价格：" suffix="万元" type="number" v-model="priceData.permission" size="large" />
+        </t-form-item>
+        <t-form-item name="openPermission">
+          <t-input label="开放许可价格：" suffix="万元" type="number" v-model="priceData.openPermission" size="large" />
+        </t-form-item>
+      </t-form>
+    </t-dialog>
   </div>
 </template>
 
@@ -228,6 +237,20 @@ const searchRequestData = ref({
 // 导出引用Dialog
 const siteDialogVisible = ref(false);
 const siteContent = ref("");
+// 价格意向Dialog
+const priceIntentionDialogVisible = ref(false);
+const priceData = ref({
+  transform: "",
+  permission: "",
+  openPermission: ""
+});
+const priceRequestData = ref(
+  {
+    priceIntention: 0,
+    widList: []
+  }
+);
+
 
 /**
  * methods
@@ -358,6 +381,19 @@ const copySite = () => {
   } else {
     MessagePlugin.error("复制失败");
   }
+};
+// 填写价格意向
+const FillingPrice = (row) => {
+  window.event.cancelBubble = true;
+  priceData.value.transform = null;
+  priceData.value.permission = null;
+  priceData.value.openPermission = null;
+  priceIntentionDialogVisible.value = true;
+  console.log(row);
+};
+// 确认价格意向
+const submitPriceIntention = () => {
+  console.log(priceData.value);
 };
 
 
