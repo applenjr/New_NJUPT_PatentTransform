@@ -6,8 +6,8 @@
           <p v-if="!!selectedRowKeys.length" class="selected-count">已选{{ selectedRowKeys.length }}项</p>
         </div>
         <div class="search-input">
-          <t-input v-model="searchRequestData.zlmc" class="searchInputStyle" placeholder="专利名称" clearable />
-          <t-input v-model="searchRequestData.zlh" class="searchInputStyle" placeholder="专利号" clearable />
+          <t-input v-model="searchRequestData.zlmc" class="searchInputStyle" placeholder="专利名称" clearable/>
+          <t-input v-model="searchRequestData.zlh" class="searchInputStyle" placeholder="专利号" clearable/>
           <t-button class="searchBtnStyle" @click="searchPatent" style="width: 100px">
             <t-icon name="search"></t-icon>
             查询
@@ -16,48 +16,49 @@
             <t-icon name="link"></t-icon>
             导出引用
           </t-button>
-          <t-button v-show="selectedRowKeys.length != 0" class="searchBtnStyle" style="width: 180px">
+          <t-button v-show="selectedRowKeys.length != 0" class="searchBtnStyle" style="width: 180px"
+                    @click="batchPrice">
             <t-icon name="edit"></t-icon>
             批量填写价格意向
           </t-button>
         </div>
       </t-row>
       <t-table
-        :data="tableData"
-        :columns="LIST_COLUMNS"
-        :row-key="rowKey"
-        cell-empty-content="-"
-        hover
-        table-layout="fixed"
-        :pagination="pagination"
-        :selected-row-keys="selectedRowKeys"
-        :loading="dataLoading"
-        :expand-on-row-click="true"
-        :expanded-row-keys="expandedRowKeys"
-        :expanded-row="expandedRow"
-        :expand-icon="false"
-        :header-affixed-top="{ offsetTop, container: getContainer }"
-        :horizontal-scroll-affixed-bottom="{ offsetBottom: '64', container: getContainer }"
-        :pagination-affixed-bottom="{ offsetBottom: '0', container: getContainer }"
-        @page-change="rehandlePageChange"
-        @select-change="rehandleSelectChange"
-        @expand-change="rehandleExpandChange"
+          :data="tableData"
+          :columns="LIST_COLUMNS"
+          :row-key="rowKey"
+          cell-empty-content="-"
+          hover
+          table-layout="fixed"
+          :pagination="pagination"
+          :selected-row-keys="selectedRowKeys"
+          :loading="dataLoading"
+          :expand-on-row-click="true"
+          :expanded-row-keys="expandedRowKeys"
+          :expanded-row="expandedRow"
+          :expand-icon="false"
+          :header-affixed-top="{ offsetTop, container: getContainer }"
+          :horizontal-scroll-affixed-bottom="{ offsetBottom: 64, container: getContainer }"
+          :pagination-affixed-bottom="{ offsetBottom: 0, container: getContainer }"
+          @page-change="rehandlePageChange"
+          @select-change="rehandleSelectChange"
+          @expand-change="rehandleExpandChange"
       >
         <template #settings="scope">
           <div class="settings_buttons">
             <t-button
-              v-if="scope.row.zlzsxzdz != '' || scope.row.certificateId != null"
-              theme="primary"
-              @click="handleExam(scope.row)"
+                v-if="scope.row.zlzsxzdz != '' || scope.row.certificateId != null"
+                theme="primary"
+                @click="handleExam(scope.row)"
             >
               <t-icon name="edit"></t-icon>
               填写审批
             </t-button>
             <t-button
-              v-if="!['', null].includes(scope.row.zlzsxzdz) || !['', null].includes(scope.row.certificateId)"
-              variant="outline"
-              theme="primary"
-              @click="downloadCertificate(scope.row)"
+                v-if="!['', null].includes(scope.row.zlzsxzdz) || !['', null].includes(scope.row.certificateId)"
+                variant="outline"
+                theme="primary"
+                @click="downloadCertificate(scope.row)"
             >
               <t-icon name="download"></t-icon>
               下载专利证书
@@ -66,19 +67,19 @@
               <t-icon name="money-circle"></t-icon>
               价格意向
             </t-button>
-            <el-upload
-              v-if="['', null].includes(scope.row.zlzsxzdz) && ['', null].includes(scope.row.certificateId)"
-              ref="upload"
-              class="upload-demo"
-              action="/pdf/upload"
-              :show-file-list="false"
-              :http-request="Upload"
-            >
-              <t-button variant="outline" theme="primary" @click="upload(scope.row, 'certificate')">
-                <t-icon name="cloud-upload"></t-icon>
-                上传专利证书
-              </t-button>
-            </el-upload>
+            <!--            <el-upload-->
+            <!--                v-if="['', null].includes(scope.row.zlzsxzdz) && ['', null].includes(scope.row.certificateId)"-->
+            <!--                ref="upload"-->
+            <!--                class="upload-demo"-->
+            <!--                action="/pdf/upload"-->
+            <!--                :show-file-list="false"-->
+            <!--                :http-request="Upload"-->
+            <!--            >-->
+            <!--              <t-button variant="outline" theme="primary" @click="upload(scope.row, 'certificate')">-->
+            <!--                <t-icon name="cloud-upload"></t-icon>-->
+            <!--                上传专利证书-->
+            <!--              </t-button>-->
+            <!--            </el-upload>-->
           </div>
         </template>
       </t-table>
@@ -86,33 +87,33 @@
 
     <!-- 导出引用 -->
     <t-dialog
-      v-model:visible="siteDialogVisible"
-      width="800px"
-      header="导出引用"
-      confirmBtn="复制"
-      :confirm-on-enter="true"
-      @confirm="copySite"
+        v-model:visible="siteDialogVisible"
+        width="800px"
+        header="导出引用"
+        confirmBtn="复制"
+        :confirm-on-enter="true"
+        @confirm="copySite"
     >
       <div id="CopyContent" v-html="siteContent"></div>
     </t-dialog>
 
     <!-- 价格意向 -->
     <t-dialog
-      v-model:visible="priceIntentionDialogVisible"
-      width="400px"
-      header="价格意向"
-      :confirm-on-enter="true"
-      @confirm="submitPriceIntention"
+        v-model:visible="priceIntentionDialogVisible"
+        width="400px"
+        header="价格意向"
+        :confirm-on-enter="true"
+        @confirm="submitPriceIntention"
     >
       <t-form labelAlign="top">
         <t-form-item name="transform">
-          <t-input label="转让价格：" suffix="万元" type="number" v-model="priceData.transform" size="large" />
+          <t-input label="转让价格：" suffix="万元" type="number" v-model="priceData.transform" size="large"/>
         </t-form-item>
         <t-form-item name="permission">
-          <t-input label="许可价格：" suffix="万元" type="number" v-model="priceData.permission" size="large" />
+          <t-input label="许可价格：" suffix="万元" type="number" v-model="priceData.permission" size="large"/>
         </t-form-item>
         <t-form-item name="openPermission">
-          <t-input label="开放许可价格：" suffix="万元" type="number" v-model="priceData.openPermission" size="large" />
+          <t-input label="开放许可价格：" suffix="万元" type="number" v-model="priceData.openPermission" size="large"/>
         </t-form-item>
       </t-form>
     </t-dialog>
@@ -120,16 +121,16 @@
 </template>
 
 <script setup lang="jsx">
-import { computed, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
-import { MessagePlugin, NotifyPlugin } from "tdesign-vue-next";
-import { useSettingStore, useUserStore } from "@/store";
-import { prefix } from "@/config/global";
+import {computed, onMounted, ref} from "vue";
+import {useRouter} from "vue-router";
+import {MessagePlugin, NotifyPlugin} from "tdesign-vue-next";
+import {useSettingStore, useUserStore} from "@/store";
+import {prefix} from "@/config/global";
 
-import { LIST_COLUMNS } from "./constants";
+import {LIST_COLUMNS} from "./constants";
 
-import { request } from "@/utils/request";
-import { setObjToUrlParams, selectElementContents } from "@/utils/request/utils";
+import {request} from "@/utils/request";
+import {setObjToUrlParams, selectElementContents} from "@/utils/request/utils";
 
 const settingStore = useSettingStore();
 const router = useRouter();
@@ -162,59 +163,59 @@ const selectedRow = ref([]);
 // 展开的行rowkey
 const expandedRowKeys = ref([]);
 // 表格拓展部分
-const expandedRow = (h, { row }) => (
-  <div>
-    <b style="color:#99a9bf">成员名单</b>
-    <span style="margin-left:10px;">{row.cymd}</span>
-    <br />
-    <br />
-    <b style="color:#99a9bf">成员工号</b>
-    <span style="margin-left:10px;">{row.cygh}</span>
-    <br />
-    <br />
-    <b style="color:#99a9bf">专利第一作者姓名</b>
-    <span style="margin-left:10px;">{row.zldyzzxm}</span>
-    <br />
-    <br />
-    <b style="color:#99a9bf">专利第一作者工号</b>
-    <span style="margin-left:10px;">{row.zldyzzgh}</span>
-    <br />
-    <br />
-    <b style="color:#99a9bf">授权日期</b>
-    <span style="margin-left:10px;">{row.sqrq}</span>
-    <br />
-    <br />
-    <b style="color:#99a9bf">归属单位</b>
-    <span style="margin-left:10px;">{row.gsdw}</span>
-    <br />
-    <br />
-    <b style="color:#99a9bf">所有权人</b>
-    <span style="margin-left:10px;">{row.zlqr}</span>
-    <br />
-    <br />
-    <b style="color:#99a9bf">专利代理人</b>
-    <span style="margin-left:10px;">{row.zldlr}</span>
-    <br />
-    <br />
-    <b style="color:#99a9bf">转让价格</b>
-    <span style="margin-left:10px;">{row.priceIntention == null ? "暂无" : `${row.priceIntention} 万元`}</span>
-    <br />
-    <br />
-    <b style="color:#99a9bf">许可价格</b>
-    <span style="margin-left:10px;">
+const expandedRow = (h, {row}) => (
+    <div>
+      <b style="color:#99a9bf">成员名单</b>
+      <span style="margin-left:10px;">{row.cymd}</span>
+      <br/>
+      <br/>
+      <b style="color:#99a9bf">成员工号</b>
+      <span style="margin-left:10px;">{row.cygh}</span>
+      <br/>
+      <br/>
+      <b style="color:#99a9bf">专利第一作者姓名</b>
+      <span style="margin-left:10px;">{row.zldyzzxm}</span>
+      <br/>
+      <br/>
+      <b style="color:#99a9bf">专利第一作者工号</b>
+      <span style="margin-left:10px;">{row.zldyzzgh}</span>
+      <br/>
+      <br/>
+      <b style="color:#99a9bf">授权日期</b>
+      <span style="margin-left:10px;">{row.sqrq}</span>
+      <br/>
+      <br/>
+      <b style="color:#99a9bf">归属单位</b>
+      <span style="margin-left:10px;">{row.gsdw}</span>
+      <br/>
+      <br/>
+      <b style="color:#99a9bf">所有权人</b>
+      <span style="margin-left:10px;">{row.zlqr}</span>
+      <br/>
+      <br/>
+      <b style="color:#99a9bf">专利代理人</b>
+      <span style="margin-left:10px;">{row.zldlr}</span>
+      <br/>
+      <br/>
+      <b style="color:#99a9bf">转让价格</b>
+      <span style="margin-left:10px;">{row.priceIntention == null ? "暂无" : `${row.priceIntention} 万元`}</span>
+      <br/>
+      <br/>
+      <b style="color:#99a9bf">许可价格</b>
+      <span style="margin-left:10px;">
       {row.licencePriceIntention == null ? "暂无" : `${row.licencePriceIntention} 万元`}
     </span>
-    <br />
-    <br />
-    <b style="color:#99a9bf">开放许可价格</b>
-    <span style="margin-left:10px;">
+      <br/>
+      <br/>
+      <b style="color:#99a9bf">开放许可价格</b>
+      <span style="margin-left:10px;">
       {row.openLicencePriceIntention == null ? "暂无" : `${row.openLicencePriceIntention} 万元`}
     </span>
-    <br />
-    <br />
-    <b style="color:#99a9bf">最后更新时间</b>
-    <span style="margin-left:10px;">{row.gmtUpdate}</span>
-  </div>
+      <br/>
+      <br/>
+      <b style="color:#99a9bf">最后更新时间</b>
+      <span style="margin-left:10px;">{row.gmtUpdate}</span>
+    </div>
 );
 // 表格loading
 const dataLoading = ref(false);
@@ -245,10 +246,10 @@ const priceData = ref({
   openPermission: ""
 });
 const priceRequestData = ref(
-  {
-    priceIntention: 0,
-    widList: []
-  }
+    {
+      priceIntention: "",
+      widList: []
+    }
 );
 
 
@@ -346,10 +347,10 @@ const getSite = () => {
         break;
     }
     let content =
-      selectedRow.value[0].cymd + "、"
-      + selectedRow.value[0].zlmc + "、"
-      + patentType + "、"
-      + selectedRow.value[0].zlh;
+        selectedRow.value[0].cymd + "、"
+        + selectedRow.value[0].zlmc + "、"
+        + patentType + "、"
+        + selectedRow.value[0].zlh;
     if (selectedRow.value.length > 1) {
       for (let i = 1; i < selectedRow.value.length; i++) {
         switch (selectedRow.value[i].zlh.split("")[4]) {
@@ -364,10 +365,10 @@ const getSite = () => {
             break;
         }
         content = content + "<br/><br/>" +
-          selectedRow.value[i].cymd + "、" +
-          selectedRow.value[i].zlmc + "、" +
-          patentType + "、" +
-          selectedRow.value[i].zlh;
+            selectedRow.value[i].cymd + "、" +
+            selectedRow.value[i].zlmc + "、" +
+            patentType + "、" +
+            selectedRow.value[i].zlh;
       }
     }
     siteContent.value = content;
@@ -384,16 +385,32 @@ const copySite = () => {
 };
 // 填写价格意向
 const FillingPrice = (row) => {
-  window.event.cancelBubble = true;
-  priceData.value.transform = null;
-  priceData.value.permission = null;
-  priceData.value.openPermission = null;
+  window.cancelBubble = true;
+  priceData.value.transform = "";
+  priceData.value.permission = "";
+  priceData.value.openPermission = "";
+  selectedRow.value = [];
+  priceRequestData.value.widList = [];
+  selectedRow.value.push(row)
   priceIntentionDialogVisible.value = true;
   console.log(row);
 };
+// 批量填写价格意向
+const batchPrice = () => {
+  priceData.value.transform = "";
+  priceData.value.permission = "";
+  priceData.value.openPermission = "";
+  priceIntentionDialogVisible.value = true;
+}
 // 确认价格意向
 const submitPriceIntention = () => {
   console.log(priceData.value);
+  console.log("priceRequestData");
+  console.log(priceRequestData.value)
+  for (let i = 0; i < selectedRow.value.length; i++) {
+    priceRequestData.value.widList.push(selectedRow.value[i].wid);
+  }
+  priceRequestData.value.priceIntention = priceData.value.transform;
 };
 
 
@@ -406,7 +423,7 @@ const rehandleExpandChange = (val) => {
   expandedRowKeys.value = val;
 };
 // 选中行钩子
-const rehandleSelectChange = (val, { selectedRowData }) => {
+const rehandleSelectChange = (val, {selectedRowData}) => {
   console.log(selectedRowData);
   selectedRowKeys.value = val;
   selectedRow.value = selectedRowData;
