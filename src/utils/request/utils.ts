@@ -1,5 +1,6 @@
 import isString from "lodash/isString";
 import isObject from "lodash/isObject";
+import { MessagePlugin } from "tdesign-vue-next";
 
 const DATE_TIME_FORMAT = "YYYY-MM-DD HH:mm:ss";
 
@@ -77,4 +78,33 @@ export function TimeDiffer(time: string) {
   // return false;
 
   return days;
+}
+
+// 一键复制
+export function selectElementContents(el) {
+  try {
+    let body = document.body,
+      range,
+      sel;
+    if (document.createRange && window.getSelection) {
+      range = document.createRange();
+      sel = window.getSelection();
+      sel.removeAllRanges();
+      try {
+        range.selectNodeContents(el);
+        sel.addRange(range);
+      } catch (e) {
+        range.selectNode(el);
+        sel.addRange(range);
+      }
+      document.execCommand("copy");
+      //取消文本选中状态
+      window.getSelection().empty();
+      MessagePlugin.success("已复制！");
+      return true;
+    }
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
 }

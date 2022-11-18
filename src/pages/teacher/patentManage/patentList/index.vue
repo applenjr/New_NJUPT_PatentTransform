@@ -12,7 +12,7 @@
             <t-icon name="search"></t-icon>
             查询
           </t-button>
-          <t-button class="searchBtnStyle" theme="success" @click="copy_site">
+          <t-button class="searchBtnStyle" theme="success" @click="getSite">
             <t-icon name="link"></t-icon>
             导出引用
           </t-button>
@@ -83,20 +83,44 @@
         </template>
       </t-table>
     </t-card>
+
+    <!-- 导出引用 -->
+    <t-dialog
+      v-model:visible="siteDialogVisible"
+      width="800px"
+      header="导出引用"
+      confirmBtn="复制"
+      :confirm-on-enter="true"
+      @confirm="copySite"
+    >
+      <div id="CopyContent" v-html="siteContent"></div>
+    </t-dialog>
+
+    <!--    &lt;!&ndash; 价格意向 &ndash;&gt;-->
+    <!--    <t-dialog-->
+    <!--      v-model:visible="priceIntentionDialogVisible"-->
+    <!--      width="800px"-->
+    <!--      header="导出引用"-->
+    <!--      confirmBtn="复制"-->
+    <!--      :confirm-on-enter="true"-->
+    <!--      @confirm="copySite"-->
+    <!--    >-->
+    <!--      <div id="CopyContent" v-html="siteContent"></div>-->
+    <!--    </t-dialog>-->
   </div>
 </template>
 
 <script setup lang="jsx">
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import { MessagePlugin } from "tdesign-vue-next";
+import { MessagePlugin, NotifyPlugin } from "tdesign-vue-next";
 import { useSettingStore, useUserStore } from "@/store";
 import { prefix } from "@/config/global";
 
 import { LIST_COLUMNS } from "./constants";
 
 import { request } from "@/utils/request";
-import { setObjToUrlParams, TimeDiffer } from "@/utils/request/utils";
+import { setObjToUrlParams, selectElementContents } from "@/utils/request/utils";
 
 const settingStore = useSettingStore();
 const router = useRouter();
@@ -107,7 +131,7 @@ const userStore = useUserStore();
  * 数据区
  * 表格相关 data
  */
-// 用户数据
+// 当前登录用户数据
 const userInfo = userStore.userInfo;
 // 表格数据
 const tableData = ref([]);
@@ -122,8 +146,10 @@ const pagination = ref({
 });
 // 行key
 const rowKey = "index";
-// 被选中的行
+// 被选中的行RowKeys
 const selectedRowKeys = ref([]);
+// 被选中的行
+const selectedRow = ref([]);
 // 展开的行rowkey
 const expandedRowKeys = ref([]);
 // 表格拓展部分
@@ -198,6 +224,11 @@ const searchRequestData = ref({
   zlh: ""
 });
 
+
+// 导出引用Dialog
+const siteDialogVisible = ref(false);
+const siteContent = ref("");
+
 /**
  * methods
  */
@@ -216,10 +247,14 @@ const offsetTop = computed(() => {
 const getContainer = () => {
   return document.querySelector(`.${prefix}-layout`);
 };
+
+
 // 获取专利列表数据
 const getPatentsListData = (requestUrl) => {
   dataLoading.value = true;
   tableData.value = [];
+  selectedRowKeys.value = [];
+  selectedRow.value = [];
   request.get({
     url: requestUrl
   }).then((res) => {
@@ -239,7 +274,6 @@ const getPatentsListData = (requestUrl) => {
     dataLoading.value = false;
   });
 };
-
 // 查询专利
 const searchPatent = async () => {
   let requestUrl = "";
@@ -268,6 +302,63 @@ const searchPatent = async () => {
   }
   getPatentsListData(requestUrl);
 };
+// 导出引用
+const getSite = () => {
+  if (selectedRow.value.length == 0) {
+    NotifyPlugin.warning({
+      title: "提示",
+      content: "请选择需要导出引用的专利"
+    });
+  } else {
+    let patentType = "";
+    switch (selectedRow.value[0].zlh.split("")[4]) {
+      case "1":
+        patentType = "发明专利";
+        break;
+      case "2":
+        patentType = "实用新型专利";
+        break;
+      case "3":
+        patentType = "外观设计专利";
+        break;
+    }
+    let content =
+      selectedRow.value[0].cymd + "、"
+      + selectedRow.value[0].zlmc + "、"
+      + patentType + "、"
+      + selectedRow.value[0].zlh;
+    if (selectedRow.value.length > 1) {
+      for (let i = 1; i < selectedRow.value.length; i++) {
+        switch (selectedRow.value[i].zlh.split("")[4]) {
+          case "1":
+            patentType = "发明专利";
+            break;
+          case "2":
+            patentType = "实用新型专利";
+            break;
+          case "3":
+            patentType = "外观设计专利";
+            break;
+        }
+        content = content + "<br/><br/>" +
+          selectedRow.value[i].cymd + "、" +
+          selectedRow.value[i].zlmc + "、" +
+          patentType + "、" +
+          selectedRow.value[i].zlh;
+      }
+    }
+    siteContent.value = content;
+    siteDialogVisible.value = true;
+  }
+};
+// 复制引用
+const copySite = () => {
+  if (selectElementContents(document.getElementById("CopyContent"))) {
+    siteDialogVisible.value = false;
+  } else {
+    MessagePlugin.error("复制失败");
+  }
+};
 
 
 /**
@@ -279,8 +370,10 @@ const rehandleExpandChange = (val) => {
   expandedRowKeys.value = val;
 };
 // 选中行钩子
-const rehandleSelectChange = (val) => {
+const rehandleSelectChange = (val, { selectedRowData }) => {
+  console.log(selectedRowData);
   selectedRowKeys.value = val;
+  selectedRow.value = selectedRowData;
 };
 // 分页变化钩子
 const rehandlePageChange = (curr) => {
